@@ -1,7 +1,7 @@
 <?php 
 require_once 'Product.php';
 
-$product = new Product(1, "T-shirt", ["https://example.com/tshirt.jpg"], 1000, "A nice T-shirt", 10, new DateTime(), new DateTime(), 1);
+$product = new Product();
 
 if (isset($product)) {
     echo "Category ID: " . $product->getCategoryId();

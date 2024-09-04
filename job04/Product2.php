@@ -54,6 +54,7 @@ class Product
     }
 
 
+
     // Les getters et setters restent inchangés
 
 
@@ -61,6 +62,14 @@ class Product
     public function getId(): int
     {
         return $this->id;
+    }
+    public function setId($id) {
+        // Vérifier que l'ID est valide (exemple: entier positif)
+        if (is_numeric($id) && $id > 0) {
+            $this->id = $id;
+        } else {
+            throw new InvalidArgumentException("L'ID doit être un entier positif.");
+        }
     }
 
     public function getName(): string
@@ -132,6 +141,23 @@ class Product
     private function updateUpdatedAt(): void
     {
         $this->updatedAt = new DateTime();
+    }
+    
+
+    public function setUpdatedAt($updatedAt) {
+        if ($updatedAt instanceof DateTime) {
+            $this->updatedAt = $updatedAt;
+        } else {
+            $this->updatedAt = new DateTime($updatedAt);
+        }
+    }
+
+    public function setCreatedAt($createdAt) {
+        if ($createdAt instanceof DateTime) {
+            $this->createdAt = $createdAt;
+        } else {
+            $this->createdAt = new DateTime($createdAt);
+        }
     }
 }
 ?>
