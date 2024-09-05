@@ -52,8 +52,8 @@ class Product
             // Vérifier si la catégorie existe
             if ($categoryData) {
                 // Vérifier l'existence des clés et définir des valeurs par défaut
-                $createdAt = isset($categoryData['created_at']) ? new DateTime($categoryData['created_at']) : new DateTime();
-                $updatedAt = isset($categoryData['updated_at']) ? new DateTime($categoryData['updated_at']) : new DateTime();
+                $createdAt = isset($categoryData['createdAt']) ? new DateTime($categoryData['createdAt']) : new DateTime();
+                $updatedAt = isset($categoryData['updatedAt']) ? new DateTime($categoryData['updatedAt']) : new DateTime();
     
                 // Créer une nouvelle instance de Category avec les paramètres nécessaires
                 $category = new Category(
@@ -218,8 +218,8 @@ class Product
                 $this->price = $productData['price'];
                 $this->description = $productData['description'];
                 $this->quantity = $productData['quantity'];
-                $this->createdAt = isset($productData['created_at']) ? new DateTime($productData['created_at']) : new DateTime();
-                $this->updatedAt = isset($productData['updated_at']) ? new DateTime($productData['updated_at']) : new DateTime();
+                $this->createdAt = isset($productData['createdAt']) ? new DateTime($productData['createdAt']) : new DateTime();
+                $this->updatedAt = isset($productData['updatedAt']) ? new DateTime($productData['updatedAt']) : new DateTime();
                 $this->category_id = $productData['category_id'];
     
                 return $this; // Retourner l'instance actuelle hydratée
@@ -253,8 +253,8 @@ class Product
                 $product->setPrice($productData['price']);
                 $product->setDescription($productData['description']);
                 $product->setQuantity($productData['quantity']);
-                $product->setCreatedAt($productData['created_at'] ?? null);
-                $product->setUpdatedAt($productData['updated_at'] ?? null);
+                $product->setCreatedAt($productData['createdAt'] ?? null);
+                $product->setUpdatedAt($productData['updatedAt'] ?? null);
                 $product->setCategoryId($productData['category_id']);
     
                 // Ajouter l'instance de Product au tableau
@@ -267,6 +267,38 @@ class Product
             return []; // Retourner un tableau vide en cas d'erreur
         }
     }
+
+    public function create(PDO $pdo)
+{
+    try {
+        // Préparer la requête d'insertion
+        $stmt = $pdo->prepare("
+            INSERT INTO product (name, photos, price, description, quantity, createdAt, updatedAt, category_id)
+            VALUES (:name, :photos, :price, :description, :quantity, :createdAt, :updatedAt, :category_id)
+        ");
+
+        // Exécuter la requête en associant les valeurs des propriétés de l'objet
+        $stmt->execute([
+            ':name' => $this->name,
+            ':photos' => json_encode($this->photos), // Convertir le tableau en JSON pour le stockage
+            ':price' => $this->price,
+            ':description' => $this->description,
+            ':quantity' => $this->quantity,
+            ':createdAt' => $this->createdAt->format('Y-m-d H:i:s'), // Formater la date pour MySQL
+            ':updatedAt' => $this->updatedAt->format('Y-m-d H:i:s'), // Formater la date pour MySQL
+            ':category_id' => $this->category_id
+        ]);
+
+        // Si l'insertion a réussi, récupérer l'ID nouvellement créé
+        $this->id = $pdo->lastInsertId();
+
+        return $this; // Retourner l'instance de Product avec l'ID mis à jour
+    } catch (PDOException $e) {
+        echo "Erreur lors de l'insertion du produit : " . $e->getMessage();
+        return false; // Retourner false en cas d'échec
+    }
+}
+    
 
     
 
